@@ -141,14 +141,7 @@ const Login = () => {
             </div>
           </form>
 
-          <div className="mt-6 p-4 bg-muted rounded-lg">
-            <h3 className="font-medium text-foreground mb-2">Instructions:</h3>
-            <div className="text-sm text-muted-foreground space-y-1">
-              <p>• Create account with bonna@gmail.com</p>
-              <p>• Use any password you want</p>
-              <p>• After signup, sign in to access dashboard</p>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
