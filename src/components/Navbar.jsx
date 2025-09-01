@@ -9,6 +9,7 @@ const Navbar = () => {
   const { user, signOut, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -56,87 +57,143 @@ const Navbar = () => {
 
   const isActive = (path) => location.pathname === path;
 
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
   if (!isAuthenticated || loading) return null;
 
   return (
-    <nav className="bg-card border-b border-border px-3 sm:px-4 py-3">
-      <div className="flex items-center justify-between">
-        {/* Logo and Title */}
-        <div className="flex items-center space-x-2">
-          <Icon name="MessageCircle" size={20} className="text-primary" />
-          <h1 className="text-base sm:text-lg font-semibold text-foreground">
-            <span className="hidden sm:block">WhatsApp Manager</span>
-            <span className="block sm:hidden">WA Manager</span>
-          </h1>
-        </div>
-        
-        {/* Navigation Items - Mobile Horizontal Scroll */}
-        <div className="flex items-center space-x-1 overflow-x-auto flex-1 mx-4">
-          {navItems.map((item) => (
-            <Button
-              key={item.path}
-              variant={isActive(item.path) ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => navigate(item.path)}
-              className="flex items-center space-x-1 whitespace-nowrap flex-shrink-0"
-            >
-              <Icon name={item.icon} size={14} />
-              <span className="text-xs sm:text-sm">
-                {item.label === 'Dashboard' ? (
-                  <>
-                    <span className="hidden sm:block">Dashboard</span>
-                    <span className="block sm:hidden">Home</span>
-                  </>
-                ) : item.label === 'Admin' ? (
-                  <>
-                    <span className="hidden sm:block">Admin</span>
-                    <span className="block sm:hidden">Admin</span>
-                  </>
-                ) : item.label === 'Upload' ? (
-                  <>
-                    <span className="hidden sm:block">Upload</span>
-                    <span className="block sm:hidden">Upload</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="hidden sm:block">{item.label}</span>
-                    <span className="block sm:hidden">{item.label.slice(0, 6)}</span>
-                  </>
-                )}
-              </span>
-            </Button>
-          ))}
-        </div>
-
-        {/* User Info and Sign Out */}
-        <div className="flex items-center space-x-2">
+    <nav className="bg-card border-b border-border">
+      <div className="px-3 sm:px-4 py-3">
+        <div className="flex items-center justify-between">
+          {/* Logo and Title */}
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
-              <Icon name="User" size={12} className="text-primary" />
-            </div>
-            <div className="block">
-              <div className="text-xs font-medium text-foreground truncate max-w-20 sm:max-w-24">
-                {user?.email?.split('@')[0]}
-              </div>
-              <div className="text-xs text-muted-foreground truncate max-w-20 sm:max-w-32">
-                {userRole === 'superadmin' ? 'Super Admin' : userRole === 'admin' ? 'Admin' : 'Moderator'}
-              </div>
-              <div className="text-xs text-blue-600 truncate max-w-20 sm:max-w-32">
-                {userCompany === 'zizii_island' ? 'Zizii Island' : 'Oasis Outfit'}
-              </div>
-            </div>
+            <Icon name="MessageCircle" size={20} className="text-primary" />
+            <h1 className="text-base sm:text-lg font-semibold text-foreground">
+              <span className="hidden sm:block">WhatsApp Manager</span>
+              <span className="block sm:hidden">WA Manager</span>
+            </h1>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
-            className="flex items-center space-x-1"
-          >
-            <Icon name="LogOut" size={14} />
-            <span className="hidden sm:block text-xs sm:text-sm">Sign Out</span>
-          </Button>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-2">
+            {navItems.map((item) => (
+              <Button
+                key={item.path}
+                variant={isActive(item.path) ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => navigate(item.path)}
+                className="flex items-center space-x-2"
+              >
+                <Icon name={item.icon} size={16} />
+                <span className="text-sm">{item.label}</span>
+              </Button>
+            ))}
+          </div>
+
+          {/* Mobile Menu Button & User Info */}
+          <div className="flex items-center space-x-2">
+            {/* User Info - Desktop */}
+            <div className="hidden sm:flex items-center space-x-2">
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <Icon name="User" size={16} className="text-primary" />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-foreground">
+                  {user?.email?.split('@')[0]}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {userRole === 'superadmin' ? 'Super Admin' : userRole === 'admin' ? 'Admin' : 'Moderator'}
+                </div>
+                <div className="text-xs text-blue-600">
+                  {userCompany === 'zizii_island' ? 'Zizii Island' : 'Oasis Outfit'}
+                </div>
+              </div>
+            </div>
+
+            {/* Sign Out - Desktop */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSignOut}
+              className="hidden sm:flex items-center space-x-2"
+            >
+              <Icon name="LogOut" size={16} />
+              <span>Sign Out</span>
+            </Button>
+
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden"
+            >
+              <Icon name={isMobileMenuOpen ? 'X' : 'Menu'} size={20} />
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-border bg-card">
+          <div className="px-3 py-2 space-y-1">
+            {/* Mobile Navigation Items */}
+            {navItems.map((item) => (
+              <Button
+                key={item.path}
+                variant={isActive(item.path) ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => {
+                  navigate(item.path);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full justify-start flex items-center space-x-3"
+              >
+                <Icon name={item.icon} size={18} />
+                <span>{item.label}</span>
+              </Button>
+            ))}
+            
+            {/* Mobile User Info */}
+            <div className="pt-2 mt-2 border-t border-border">
+              <div className="flex items-center space-x-3 px-3 py-2">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Icon name="User" size={20} className="text-primary" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-foreground">
+                    {user?.email?.split('@')[0]}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {userRole === 'superadmin' ? 'Super Admin' : userRole === 'admin' ? 'Admin' : 'Moderator'}
+                  </div>
+                  <div className="text-xs text-blue-600">
+                    {userCompany === 'zizii_island' ? 'Zizii Island' : 'Oasis Outfit'}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Mobile Sign Out */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  handleSignOut();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full justify-start flex items-center space-x-3 mt-2"
+              >
+                <Icon name="LogOut" size={18} />
+                <span>Sign Out</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
