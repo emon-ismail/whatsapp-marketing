@@ -157,6 +157,46 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteModerator = async (moderatorId, moderatorName) => {
+    const confirmDelete = confirm(
+      `Are you sure you want to delete moderator "${moderatorName}"?\n\n` +
+      'This will:\n' +
+      '• Unassign all their phone numbers\n' +
+      '• Remove all their data permanently\n' +
+      '• This action cannot be undone!'
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      // First, unassign all phone numbers from this moderator
+      const { error: unassignError } = await supabase
+        .from('phone_numbers')
+        .update({ assigned_moderator: null })
+        .eq('assigned_moderator', moderatorId);
+
+      if (unassignError) throw unassignError;
+
+      // Then delete the moderator
+      const { error: deleteError } = await supabase
+        .from('moderators')
+        .delete()
+        .eq('id', moderatorId);
+
+      if (deleteError) throw deleteError;
+
+      alert('Moderator deleted successfully!');
+      
+      // Refresh data
+      fetchModeratorsStats();
+      fetchOverallStats();
+      fetchDailyReports();
+    } catch (error) {
+      console.error('Error deleting moderator:', error);
+      alert('Error deleting moderator. Please try again.');
+    }
+  };
+
   const fetchDailyReports = async () => {
     try {
       const { data: moderatorsList, error } = await supabase
@@ -397,6 +437,7 @@ const AdminDashboard = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Progress</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Order Rate</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -441,6 +482,15 @@ const AdminDashboard = () => {
                         }`}>
                           {moderator.status}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => handleDeleteModerator(moderator.id, moderator.name)}
+                          className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors duration-200 flex items-center space-x-1"
+                        >
+                          <Icon name="Trash2" size={14} />
+                          <span>Delete</span>
+                        </button>
                       </td>
                     </tr>
                   ))}
