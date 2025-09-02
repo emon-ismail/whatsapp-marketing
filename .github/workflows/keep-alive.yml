@@ -10,4 +10,4 @@ jobs:
     steps:
       - name: Ping Netlify Function
         run: |
-          curl -f https://your-netlify-site.netlify.app/.netlify/functions/keep-alive || exit 1
+          curl -f https://oasispro.netlify.app/.netlify/functions/keep-alive || exit 1
