@@ -801,27 +801,34 @@ const ModeratorDashboard = () => {
               todayDoneNumbers.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-4 bg-card border border-border rounded-lg opacity-75"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 space-y-3 sm:space-y-0"
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-                      <Icon name="CheckCircle" size={20} className="text-green-600" />
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full shadow-md">
+                      <Icon name="CheckCircle" size={16} className="text-white" />
                     </div>
-                    <div>
-                      <p className="font-medium text-foreground">{item.phone_number}</p>
-                      <div className="flex items-center space-x-2">
-                        <p className="text-sm text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{item.phone_number}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                        <p className="text-xs sm:text-sm text-gray-600 font-medium">
                           Completed: {new Date(item.updated_at).toLocaleDateString()}
                         </p>
-                        {item.has_whatsapp !== null && (
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            item.has_whatsapp 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {item.has_whatsapp ? 'Has WhatsApp' : 'No WhatsApp'}
-                          </span>
-                        )}
+                        <div className="flex flex-wrap gap-1">
+                          {item.has_whatsapp !== null && (
+                            <span className={`text-xs px-2 py-1 rounded-full shadow-sm ${
+                              item.has_whatsapp 
+                                ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
+                                : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
+                            }`}>
+                              {item.has_whatsapp ? 'Has WA' : 'No WA'}
+                            </span>
+                          )}
+                          {item.has_ordered && (
+                            <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm">
+                              Ordered
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -831,10 +838,10 @@ const ModeratorDashboard = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleWhatsAppClick(item.phone_number)}
-                      className="flex items-center space-x-2"
+                      className="flex items-center space-x-1"
                     >
-                      <Icon name="MessageCircle" size={16} />
-                      <span>WhatsApp</span>
+                      <Icon name="MessageCircle" size={14} />
+                      <span className="text-xs sm:text-sm">WhatsApp</span>
                     </Button>
                   </div>
                 </div>
@@ -953,52 +960,54 @@ const ModeratorDashboard = () => {
               orderedNumbers.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-4 bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 space-y-3 sm:space-y-0"
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full shadow-md">
-                      <Icon name="ShoppingCart" size={20} className="text-white" />
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full shadow-md">
+                      <Icon name="ShoppingCart" size={16} className="text-white" />
                     </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">{item.phone_number}</p>
-                      <div className="flex items-center space-x-2">
-                        <p className="text-sm text-gray-600 font-medium">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{item.phone_number}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                        <p className="text-xs sm:text-sm text-gray-600 font-medium">
                           Ordered: {new Date(item.order_date).toLocaleDateString()}
                         </p>
-                        <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm">
-                          Order Confirmed
-                        </span>
-                        {item.has_whatsapp !== null && (
-                          <span className={`text-xs px-2 py-1 rounded-full shadow-sm ${
-                            item.has_whatsapp 
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
-                              : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
-                          }`}>
-                            {item.has_whatsapp ? 'Has WhatsApp' : 'No WhatsApp'}
+                        <div className="flex flex-wrap gap-1">
+                          <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm">
+                            Order Confirmed
                           </span>
-                        )}
+                          {item.has_whatsapp !== null && (
+                            <span className={`text-xs px-2 py-1 rounded-full shadow-sm ${
+                              item.has_whatsapp 
+                                ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
+                                : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
+                            }`}>
+                              {item.has_whatsapp ? 'Has WA' : 'No WA'}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:space-x-2">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleWhatsAppClick(item.phone_number)}
-                      className="flex items-center space-x-2"
+                      className="flex items-center space-x-1 flex-1 sm:flex-none justify-center"
                     >
-                      <Icon name="MessageCircle" size={16} />
-                      <span>WhatsApp</span>
+                      <Icon name="MessageCircle" size={14} />
+                      <span className="text-xs sm:text-sm">WhatsApp</span>
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleOrderUpdate(item.id, false)}
-                      className="text-red-600 hover:text-red-700 flex items-center space-x-1"
+                      className="text-red-600 hover:text-red-700 flex items-center space-x-1 flex-1 sm:flex-none justify-center"
                     >
                       <Icon name="X" size={14} />
-                      <span>Remove</span>
+                      <span className="text-xs sm:text-sm">Remove</span>
                     </Button>
                   </div>
                 </div>
@@ -1017,22 +1026,22 @@ const ModeratorDashboard = () => {
               noWhatsAppNumbers.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-4 bg-card border border-border rounded-lg opacity-75"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 space-y-3 sm:space-y-0"
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
-                      <Icon name="XCircle" size={20} className="text-red-600" />
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-red-500 to-rose-600 rounded-full shadow-md">
+                      <Icon name="XCircle" size={16} className="text-white" />
                     </div>
-                    <div>
-                      <p className="font-medium text-foreground">{item.phone_number}</p>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{item.phone_number}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium">
                         Marked: {new Date(item.updated_at).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800">
+                    <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-sm">
                       No WhatsApp
                     </span>
                   </div>
