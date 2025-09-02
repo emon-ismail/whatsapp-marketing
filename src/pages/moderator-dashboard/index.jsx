@@ -196,6 +196,7 @@ const ModeratorDashboard = () => {
         .from('phone_numbers')
         .select('*', { count: 'exact', head: true })
         .eq('assigned_moderator', moderatorId)
+        .eq('status', 'done')
         .eq('has_whatsapp', false);
 
       if (noWhatsappError) console.error('No WhatsApp error:', noWhatsappError);
@@ -260,6 +261,7 @@ const ModeratorDashboard = () => {
         .from('phone_numbers')
         .select('*')
         .eq('assigned_moderator', moderatorId)
+        .eq('status', 'done')
         .eq('has_whatsapp', false)
         .order('updated_at', { ascending: false });
 
@@ -393,13 +395,30 @@ const ModeratorDashboard = () => {
 
   const handleStatusUpdate = async (numberId, status, hasWhatsapp = null) => {
     try {
-      const { error } = await supabase.rpc('update_phone_status', {
-        phone_id: numberId,
-        new_status: status,
-        whatsapp_status: hasWhatsapp
-      });
+      console.log('Updating status:', { numberId, status, hasWhatsapp });
+      
+      const updateData = {
+        status: status,
+        updated_at: new Date().toISOString()
+      };
+      
+      if (hasWhatsapp !== null) {
+        updateData.has_whatsapp = hasWhatsapp;
+      }
+      
+      console.log('Update data:', updateData);
+      
+      const { error } = await supabase
+        .from('phone_numbers')
+        .update(updateData)
+        .eq('id', numberId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database update error:', error);
+        throw error;
+      }
+      
+      console.log('Status updated successfully');
 
       // Check if we need to assign more numbers
       if (user) {
@@ -417,6 +436,20 @@ const ModeratorDashboard = () => {
       fetchNumbers();
       fetchDoneNumbers();
       fetchTodayDoneNumbers();
+      
+      // Always refresh no whatsapp numbers and stats
+      if (user) {
+        const { data: moderatorData } = await supabase
+          .from('moderators')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (moderatorData) {
+          await fetchNoWhatsAppNumbers(moderatorData.id);
+          await fetchDailyStats(moderatorData.id);
+        }
+      }
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -878,58 +911,61 @@ const ModeratorDashboard = () => {
               ).map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-4 bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 space-y-3 sm:space-y-0"
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full shadow-md">
-                      <Icon name="CheckCircle" size={20} className="text-white" />
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full shadow-md">
+                      <Icon name="CheckCircle" size={16} className="text-white" />
                     </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">{item.phone_number}</p>
-                      <div className="flex items-center space-x-2">
-                        <p className="text-sm text-gray-600 font-medium">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{item.phone_number}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                        <p className="text-xs sm:text-sm text-gray-600 font-medium">
                           Completed: {new Date(item.updated_at).toLocaleDateString()}
                         </p>
-                        {item.has_whatsapp !== null && (
-                          <span className={`text-xs px-2 py-1 rounded-full shadow-sm ${
-                            item.has_whatsapp 
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
-                              : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
-                          }`}>
-                            {item.has_whatsapp ? 'Has WhatsApp' : 'No WhatsApp'}
-                          </span>
-                        )}
-                        {item.has_ordered && (
-                          <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm">
-                            Ordered on {new Date(item.order_date).toLocaleDateString()}
-                          </span>
-                        )}
+                        <div className="flex flex-wrap gap-1">
+                          {item.has_whatsapp !== null && (
+                            <span className={`text-xs px-2 py-1 rounded-full shadow-sm ${
+                              item.has_whatsapp 
+                                ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
+                                : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
+                            }`}>
+                              {item.has_whatsapp ? 'Has WA' : 'No WA'}
+                            </span>
+                          )}
+                          {item.has_ordered && (
+                            <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm">
+                              Ordered {new Date(item.order_date).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:space-x-2">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleWhatsAppClick(item.phone_number)}
-                      className="flex items-center space-x-2"
+                      className="flex items-center space-x-1 flex-1 sm:flex-none justify-center"
                     >
-                      <Icon name="MessageCircle" size={16} />
-                      <span>WhatsApp</span>
+                      <Icon name="MessageCircle" size={14} />
+                      <span className="text-xs sm:text-sm">WhatsApp</span>
                     </Button>
                     {item.has_ordered ? (
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm">
+                      <div className="flex gap-2 flex-1 sm:flex-none">
+                        <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm flex items-center">
                           Ordered
                         </span>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleOrderUpdate(item.id, false)}
-                          className="text-red-600 hover:text-red-700"
+                          className="text-red-600 hover:text-red-700 flex items-center space-x-1"
                         >
                           <Icon name="X" size={14} />
+                          <span className="text-xs sm:text-sm">Remove</span>
                         </Button>
                       </div>
                     ) : (
@@ -937,10 +973,10 @@ const ModeratorDashboard = () => {
                         variant="default"
                         size="sm"
                         onClick={() => handleOrderUpdate(item.id, true)}
-                        className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white flex items-center space-x-1"
+                        className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white flex items-center space-x-1 flex-1 sm:flex-none justify-center"
                       >
                         <Icon name="ShoppingCart" size={14} />
-                        <span>Mark Order</span>
+                        <span className="text-xs sm:text-sm">Mark Order</span>
                       </Button>
                     )}
                   </div>
