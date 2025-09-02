@@ -183,100 +183,102 @@ const BirthdayDashboard = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-            🎂 Birthday Dashboard
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Zizii Island Birthday Campaign</p>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="p-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg">
+              <Icon name="Gift" className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Birthday Dashboard
+            </h1>
+          </div>
+          <p className="text-sm text-gray-600">Zizii Island Birthday Campaign Management</p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-card border border-border rounded-lg p-3 sm:p-6 text-center">
-            <p className="text-xl sm:text-2xl font-bold text-blue-600">{stats.today}</p>
-            <p className="text-xs sm:text-sm text-muted-foreground">Today</p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg">
+                <Icon name="Gift" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Today's Birthdays</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.today}</p>
+              </div>
+            </div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-3 sm:p-6 text-center">
-            <p className="text-xl sm:text-2xl font-bold text-orange-600">{stats.thisWeek}</p>
-            <p className="text-xs sm:text-sm text-muted-foreground">This Week</p>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg">
+                <Icon name="Calendar" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">This Week</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.thisWeek}</p>
+              </div>
+            </div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-3 sm:p-6 text-center">
-            <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.thisMonth}</p>
-            <p className="text-xs sm:text-sm text-muted-foreground">This Month</p>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg">
+                <Icon name="CalendarDays" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">This Month</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.thisMonth}</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Birthday Reminders (7 days before) */}
+        {/* Birthday Reminders */}
         {reminderBirthdays.length > 0 && (
-          <div className="mb-6 sm:mb-8">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">🔔 Birthday Reminders (7 Days Before) ({reminderBirthdays.length})</h2>
-            <div className="space-y-3 sm:space-y-4">
+          <div className="mb-8">
+            <div className="flex items-center space-x-2 mb-4">
+              <Icon name="Bell" className="h-5 w-5 text-amber-600" />
+              <h2 className="text-lg font-medium text-gray-900">Birthday Reminders</h2>
+              <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">{reminderBirthdays.length}</span>
+            </div>
+            <div className="grid gap-4">
               {reminderBirthdays.map((item) => {
                 const birthday = new Date(item.birthday);
                 const birthdayThisYear = new Date(new Date().getFullYear(), birthday.getMonth(), birthday.getDate());
                 const daysUntil = Math.ceil((birthdayThisYear - new Date()) / (1000 * 60 * 60 * 24));
                 
                 return (
-                  <div key={item.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-                      <div className="flex items-center space-x-3 sm:space-x-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-200 rounded-full flex items-center justify-center flex-shrink-0">
-                          🔔
+                  <div key={item.id} className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
+                      <div className="flex items-center space-x-4">
+                        <div className="h-12 w-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
+                          <Icon name="Bell" className="h-6 w-6 text-white" />
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm sm:text-base truncate">{item.phone_number}</p>
-                          <p className="text-sm font-medium text-blue-600 truncate">{item.person_name || 'No name'}</p>
-                          <p className="text-xs sm:text-sm text-yellow-700">
-                            Birthday in {daysUntil} days - {new Date(item.birthday).toLocaleDateString()}
-                          </p>
+                        <div>
+                          <p className="font-medium text-gray-900">{item.phone_number}</p>
+                          <p className="text-sm font-medium text-blue-600">{item.person_name || 'No name'}</p>
+                          <p className="text-sm text-amber-700">Birthday in {daysUntil} days • {new Date(item.birthday).toLocaleDateString()}</p>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleCall(item.phone_number)}
-                          className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm"
-                        >
-                          <Icon name="Phone" size={14} className="mr-1" />
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={() => handleCall(item.phone_number)} className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-1 text-sm">
+                          <Icon name="Phone" className="h-4 w-4" />
                           <span>Call</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            const name = item.person_name || 'friend';
-                            const message = `Hi ${name}! Just wanted to remind you that your birthday is coming up in ${daysUntil} days! 🎉 Hope you're planning something special! 🎂`;
-                            handleWhatsAppClick(item.phone_number, null, message);
-                          }}
-                          className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
-                        >
-                          <Icon name="MessageCircle" size={14} className="mr-1" />
-                          <span className="hidden sm:inline">Remind</span>
-                          <span className="sm:hidden">Remind</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            const name = item.person_name || 'friend';
-                            const message = `Hi ${name}! Your birthday is in ${daysUntil} days! 🎉 Hope you have a wonderful celebration! 🎂`;
-                            handleSMS(item.phone_number, null, message);
-                          }}
-                          className="bg-purple-600 hover:bg-purple-700 text-xs sm:text-sm"
-                        >
-                          <Icon name="MessageSquare" size={14} className="mr-1" />
-                          <span>SMS</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleStatusUpdate(item.id)}
-                          className="text-xs sm:text-sm"
-                        >
-                          <Icon name="Check" size={14} className="sm:mr-1" />
-                          <span className="hidden sm:inline">Done</span>
-                        </Button>
+                        </button>
+                        <button onClick={() => {
+                          const name = item.person_name || 'friend';
+                          const message = `Hi ${name}! Your birthday is in ${daysUntil} days! 🎉 Hope you have a wonderful celebration! 🎂`;
+                          handleWhatsAppClick(item.phone_number, null, message);
+                        }} className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-1 text-sm">
+                          <Icon name="MessageCircle" className="h-4 w-4" />
+                          <span>WhatsApp</span>
+                        </button>
+                        <button onClick={() => handleStatusUpdate(item.id)} className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-1 text-sm">
+                          <Icon name="Check" className="h-4 w-4" />
+                          <span>Done</span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -287,68 +289,52 @@ const BirthdayDashboard = () => {
         )}
 
         {/* Today's Birthdays */}
-        <div className="mb-6 sm:mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">🎉 Today's Birthdays ({todayBirthdays.length})</h2>
+        <div className="mb-8">
+          <div className="flex items-center space-x-2 mb-4">
+            <Icon name="Gift" className="h-5 w-5 text-pink-600" />
+            <h2 className="text-lg font-medium text-gray-900">Today's Birthdays</h2>
+            <span className="bg-pink-100 text-pink-800 text-xs font-medium px-2 py-1 rounded-full">{todayBirthdays.length}</span>
+          </div>
           {todayBirthdays.length === 0 ? (
-            <div className="text-center py-8 sm:py-12 bg-card border rounded-lg">
-              <Icon name="Gift" size={48} className="mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">No birthdays today</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+              <div className="p-3 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Icon name="Gift" className="h-8 w-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500">No birthdays today</p>
             </div>
           ) : (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="grid gap-4">
               {todayBirthdays.map((item) => (
-                <div key={item.id} className="bg-card border rounded-lg p-3 sm:p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-                    <div className="flex items-center space-x-3 sm:space-x-4">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Icon name="Gift" size={20} className="text-yellow-600" />
+                <div key={item.id} className="bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200 rounded-xl p-4">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
+                    <div className="flex items-center space-x-4">
+                      <div className="h-12 w-12 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center">
+                        <Icon name="Gift" className="h-6 w-6 text-white" />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-sm sm:text-base truncate">{item.phone_number}</p>
-                        <p className="text-sm font-medium text-blue-600 truncate">{item.person_name || 'No name'}</p>
-                        <p className="text-xs sm:text-sm text-muted-foreground">
-                          {new Date(item.birthday).toLocaleDateString()}
-                        </p>
+                      <div>
+                        <p className="font-medium text-gray-900">{item.phone_number}</p>
+                        <p className="text-sm font-medium text-blue-600">{item.person_name || 'No name'}</p>
+                        <p className="text-sm text-gray-500">{new Date(item.birthday).toLocaleDateString()}</p>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => handleCall(item.phone_number)}
-                        className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm"
-                      >
-                        <Icon name="Phone" size={14} className="mr-1" />
-                        <span className="hidden sm:inline">Call</span>
-                        <span className="sm:hidden">Call</span>
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleWhatsAppClick(item.phone_number, item.person_name)}
-                        className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
-                      >
-                        <Icon name="MessageCircle" size={14} className="mr-1" />
-                        <span className="hidden sm:inline">WhatsApp</span>
-                        <span className="sm:hidden">WA</span>
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleSMS(item.phone_number, item.person_name)}
-                        className="bg-purple-600 hover:bg-purple-700 text-xs sm:text-sm"
-                      >
-                        <Icon name="MessageSquare" size={14} className="mr-1" />
-                        <span className="hidden sm:inline">SMS</span>
-                        <span className="sm:hidden">SMS</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleStatusUpdate(item.id)}
-                        className="text-xs sm:text-sm"
-                      >
-                        <Icon name="Check" size={14} className="sm:mr-1" />
-                        <span className="hidden sm:inline">Done</span>
-                      </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <button onClick={() => handleCall(item.phone_number)} className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-1 text-sm">
+                        <Icon name="Phone" className="h-4 w-4" />
+                        <span>Call</span>
+                      </button>
+                      <button onClick={() => handleWhatsAppClick(item.phone_number, item.person_name)} className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-1 text-sm">
+                        <Icon name="MessageCircle" className="h-4 w-4" />
+                        <span>WhatsApp</span>
+                      </button>
+                      <button onClick={() => handleSMS(item.phone_number, item.person_name)} className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-1 text-sm">
+                        <Icon name="MessageSquare" className="h-4 w-4" />
+                        <span>SMS</span>
+                      </button>
+                      <button onClick={() => handleStatusUpdate(item.id)} className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-1 text-sm">
+                        <Icon name="Check" className="h-4 w-4" />
+                        <span>Done</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -360,68 +346,48 @@ const BirthdayDashboard = () => {
 
 
         {/* Recent Birthdays */}
-        <div className="mb-6 sm:mb-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">🎂 Recent (Last 7 Days) ({recentBirthdays.length})</h2>
+        <div className="mb-8">
+          <div className="flex items-center space-x-2 mb-4">
+            <Icon name="Clock" className="h-5 w-5 text-orange-600" />
+            <h2 className="text-lg font-medium text-gray-900">Recent Birthdays</h2>
+            <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded-full">{recentBirthdays.length}</span>
+          </div>
           {recentBirthdays.length === 0 ? (
-            <div className="text-center py-8 sm:py-12 bg-card border rounded-lg">
-              <Icon name="Clock" size={48} className="mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">No recent birthdays</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+              <div className="p-3 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Icon name="Clock" className="h-8 w-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500">No recent birthdays</p>
             </div>
           ) : (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="grid gap-4">
               {recentBirthdays.map((item) => (
-                <div key={item.id} className="bg-card border rounded-lg p-3 sm:p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-                    <div className="flex items-center space-x-3 sm:space-x-4">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Icon name="Clock" size={20} className="text-orange-600" />
+                <div key={item.id} className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-4">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
+                    <div className="flex items-center space-x-4">
+                      <div className="h-12 w-12 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full flex items-center justify-center">
+                        <Icon name="Clock" className="h-6 w-6 text-white" />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-sm sm:text-base truncate">{item.phone_number}</p>
-                        <p className="text-sm font-medium text-blue-600 truncate">{item.person_name || 'No name'}</p>
-                        <p className="text-xs sm:text-sm text-muted-foreground">
-                          {new Date(item.birthday).toLocaleDateString()}
-                        </p>
+                      <div>
+                        <p className="font-medium text-gray-900">{item.phone_number}</p>
+                        <p className="text-sm font-medium text-blue-600">{item.person_name || 'No name'}</p>
+                        <p className="text-sm text-gray-500">{new Date(item.birthday).toLocaleDateString()}</p>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => handleCall(item.phone_number)}
-                        className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm"
-                      >
-                        <Icon name="Phone" size={14} className="mr-1" />
-                        <span className="hidden sm:inline">Call</span>
-                        <span className="sm:hidden">Call</span>
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleWhatsAppClick(item.phone_number, item.person_name)}
-                        className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
-                      >
-                        <Icon name="MessageCircle" size={14} className="mr-1" />
-                        <span className="hidden sm:inline">WhatsApp</span>
-                        <span className="sm:hidden">WA</span>
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleSMS(item.phone_number, item.person_name)}
-                        className="bg-purple-600 hover:bg-purple-700 text-xs sm:text-sm"
-                      >
-                        <Icon name="MessageSquare" size={14} className="mr-1" />
-                        <span className="hidden sm:inline">SMS</span>
-                        <span className="sm:hidden">SMS</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleStatusUpdate(item.id)}
-                        className="text-xs sm:text-sm"
-                      >
-                        <Icon name="Check" size={14} className="sm:mr-1" />
-                        <span className="hidden sm:inline">Done</span>
-                      </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <button onClick={() => handleCall(item.phone_number)} className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-1 text-sm">
+                        <Icon name="Phone" className="h-4 w-4" />
+                        <span>Call</span>
+                      </button>
+                      <button onClick={() => handleWhatsAppClick(item.phone_number, item.person_name)} className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-1 text-sm">
+                        <Icon name="MessageCircle" className="h-4 w-4" />
+                        <span>WhatsApp</span>
+                      </button>
+                      <button onClick={() => handleStatusUpdate(item.id)} className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-1 text-sm">
+                        <Icon name="Check" className="h-4 w-4" />
+                        <span>Done</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -432,14 +398,20 @@ const BirthdayDashboard = () => {
 
         {/* Upcoming Birthdays */}
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">📅 Upcoming (Next 7 Days) ({upcomingBirthdays.length})</h2>
+          <div className="flex items-center space-x-2 mb-4">
+            <Icon name="Calendar" className="h-5 w-5 text-blue-600" />
+            <h2 className="text-lg font-medium text-gray-900">Upcoming Birthdays</h2>
+            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">{upcomingBirthdays.length}</span>
+          </div>
           {upcomingBirthdays.length === 0 ? (
-            <div className="text-center py-8 sm:py-12 bg-card border rounded-lg">
-              <Icon name="Calendar" size={48} className="mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">No upcoming birthdays</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+              <div className="p-3 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Icon name="Calendar" className="h-8 w-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500">No upcoming birthdays</p>
             </div>
           ) : (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="grid gap-4">
               {upcomingBirthdays.map((item) => {
                 const birthday = new Date(item.birthday);
                 const today = new Date();
@@ -454,64 +426,36 @@ const BirthdayDashboard = () => {
                 }
                 
                 return (
-                  <div key={item.id} className="bg-card border rounded-lg p-3 sm:p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-                      <div className="flex items-center space-x-3 sm:space-x-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Icon name="Calendar" size={20} className="text-blue-600" />
+                  <div key={item.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
+                      <div className="flex items-center space-x-4">
+                        <div className="h-12 w-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                          <Icon name="Calendar" className="h-6 w-6 text-white" />
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm sm:text-base truncate">{item.phone_number}</p>
-                          <p className="text-sm font-medium text-blue-600 truncate">{item.person_name || 'No name'}</p>
-                          <p className="text-xs sm:text-sm text-muted-foreground">
-                            Birthday in {daysUntil} days - {new Date(item.birthday).toLocaleDateString()}
-                          </p>
+                        <div>
+                          <p className="font-medium text-gray-900">{item.phone_number}</p>
+                          <p className="text-sm font-medium text-blue-600">{item.person_name || 'No name'}</p>
+                          <p className="text-sm text-blue-700">Birthday in {daysUntil} days • {new Date(item.birthday).toLocaleDateString()}</p>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleCall(item.phone_number)}
-                          className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm"
-                        >
-                          <Icon name="Phone" size={14} className="mr-1" />
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={() => handleCall(item.phone_number)} className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-1 text-sm">
+                          <Icon name="Phone" className="h-4 w-4" />
                           <span>Call</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            const name = item.person_name || 'friend';
-                            const message = `Hi ${name}! Your birthday is coming up in ${daysUntil} days! 🎉 Just wanted to wish you an early happy birthday! 🎂`;
-                            handleWhatsAppClick(item.phone_number, item.person_name, message);
-                          }}
-                          className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
-                        >
-                          <Icon name="MessageCircle" size={14} className="mr-1" />
-                          <span className="hidden sm:inline">WhatsApp</span>
-                          <span className="sm:hidden">WA</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            const name = item.person_name || 'friend';
-                            const message = `Hi ${name}! Your birthday is in ${daysUntil} days! 🎉 Early happy birthday wishes! 🎂`;
-                            handleSMS(item.phone_number, item.person_name, message);
-                          }}
-                          className="bg-purple-600 hover:bg-purple-700 text-xs sm:text-sm"
-                        >
-                          <Icon name="MessageSquare" size={14} className="mr-1" />
-                          <span>SMS</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleStatusUpdate(item.id)}
-                          className="text-xs sm:text-sm"
-                        >
-                          <Icon name="Check" size={14} className="sm:mr-1" />
-                          <span className="hidden sm:inline">Done</span>
-                        </Button>
+                        </button>
+                        <button onClick={() => {
+                          const name = item.person_name || 'friend';
+                          const message = `Hi ${name}! Your birthday is coming up in ${daysUntil} days! 🎉 Just wanted to wish you an early happy birthday! 🎂`;
+                          handleWhatsAppClick(item.phone_number, item.person_name, message);
+                        }} className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-1 text-sm">
+                          <Icon name="MessageCircle" className="h-4 w-4" />
+                          <span>WhatsApp</span>
+                        </button>
+                        <button onClick={() => handleStatusUpdate(item.id)} className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-1 text-sm">
+                          <Icon name="Check" className="h-4 w-4" />
+                          <span>Done</span>
+                        </button>
                       </div>
                     </div>
                   </div>

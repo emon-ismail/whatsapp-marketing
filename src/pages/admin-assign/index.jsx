@@ -98,193 +98,260 @@ const AdminAssign = () => {
   };
 
   return (
-    <div className="bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Admin - Assign Numbers to Moderators
-          </h1>
-          <p className="text-muted-foreground">
-            Distribute unassigned phone numbers evenly among active moderators
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg">
+              <Icon name="Users" className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Number Assignment
+            </h1>
+          </div>
+          <p className="text-sm text-gray-600">
+            Distribute unassigned phone numbers to active moderators
           </p>
         </div>
 
-        {/* Assignment Control */}
-        <div className="bg-card border border-border rounded-lg p-6 mb-6">
-          <h3 className="font-medium text-foreground mb-4">Assignment Control</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">{unassignedCount.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Total Numbers</p>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <p className="text-2xl font-bold text-green-600">{selectedModerators.size}</p>
-              <p className="text-sm text-muted-foreground">Selected Moderators</p>
-            </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <p className="text-2xl font-bold text-purple-600">{selectedModerators.size > 0 ? Math.floor(unassignedCount / selectedModerators.size).toLocaleString() : '0'}</p>
-              <p className="text-sm text-muted-foreground">Per Moderator (Auto)</p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg">
+                <Icon name="Phone" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Unassigned Numbers</p>
+                <p className="text-2xl font-semibold text-gray-900">{unassignedCount.toLocaleString()}</p>
+              </div>
             </div>
           </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg">
+                <Icon name="Users" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Selected Moderators</p>
+                <p className="text-2xl font-semibold text-gray-900">{selectedModerators.size}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg">
+                <Icon name="Target" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Per Moderator</p>
+                <p className="text-2xl font-semibold text-gray-900">{selectedModerators.size > 0 ? Math.floor(unassignedCount / selectedModerators.size).toLocaleString() : '0'}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg">
+                <Icon name="CheckCircle" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Will Assign</p>
+                <p className="text-2xl font-semibold text-gray-900">{(selectedModerators.size * numbersPerModerator).toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <div className="space-y-4">
+        {/* Assignment Configuration */}
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6 mb-8">
+          <div className="flex items-center space-x-2 mb-4">
+            <Icon name="Settings" className="h-5 w-5 text-indigo-600" />
+            <h3 className="text-lg font-medium text-gray-900">Assignment Configuration</h3>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">Numbers per moderator:</label>
-              <div className="flex items-center space-x-4">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Numbers per moderator</label>
+              <div className="flex items-center space-x-3">
                 <input
                   type="number"
                   min="100"
                   max="5000"
                   value={numbersPerModerator}
                   onChange={(e) => setNumbersPerModerator(parseInt(e.target.value) || 2000)}
-                  className="w-32 px-3 py-2 border border-border rounded-md text-center"
+                  className="w-32 px-3 py-2 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={() => setNumbersPerModerator(selectedModerators.size > 0 ? Math.floor(unassignedCount / selectedModerators.size) : 0)}
                   disabled={selectedModerators.size === 0}
+                  className="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Auto Calculate
-                </Button>
+                </button>
               </div>
             </div>
-
-            <div className="bg-muted rounded-lg p-4">
-              <h4 className="font-medium text-foreground mb-2">Assignment Preview:</h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Will Assign:</span>
-                  <span className="ml-2 font-medium text-green-600">{(selectedModerators.size * numbersPerModerator).toLocaleString()}</span>
+            <div className="bg-white rounded-lg p-4 border border-indigo-100">
+              <h4 className="text-sm font-medium text-gray-900 mb-3">Assignment Preview</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Will Assign:</span>
+                  <span className="font-medium text-green-600">{(selectedModerators.size * numbersPerModerator).toLocaleString()}</span>
                 </div>
-                <div>
-                  <span className="text-muted-foreground">Remaining:</span>
-                  <span className="ml-2 font-medium">{Math.max(0, unassignedCount - (selectedModerators.size * numbersPerModerator)).toLocaleString()}</span>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Remaining:</span>
+                  <span className="font-medium text-gray-900">{Math.max(0, unassignedCount - (selectedModerators.size * numbersPerModerator)).toLocaleString()}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center space-x-3">
-                <Icon name="Phone" size={24} className="text-primary" />
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{unassignedCount}</p>
-                  <p className="text-sm text-muted-foreground">Unassigned Numbers</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center space-x-3">
-                <Icon name="Users" size={24} className="text-primary" />
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{moderators.length}</p>
-                  <p className="text-sm text-muted-foreground">Active Moderators</p>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Moderator Selection */}
+          <div className="lg:col-span-2">
 
-          <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium text-foreground">Select Moderators</h3>
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedModerators(new Set(moderators.map(m => m.id)))}
-                >
-                  Select All
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedModerators(new Set())}
-                >
-                  Clear All
-                </Button>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-medium text-gray-900">Select Moderators</h3>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setSelectedModerators(new Set(moderators.map(m => m.id)))}
+                      className="px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      Select All
+                    </button>
+                    <button
+                      onClick={() => setSelectedModerators(new Set())}
+                      className="px-3 py-1 text-sm font-medium text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-            {moderators.length === 0 ? (
-              <p className="text-muted-foreground">No active moderators found</p>
-            ) : (
-              <div className="space-y-2">
-                {moderators.map((moderator) => (
-                  <div key={moderator.id} className={`flex items-center space-x-3 p-3 rounded-lg border transition-all ${
-                    selectedModerators.has(moderator.id) 
-                      ? 'bg-blue-50 border-blue-200' 
-                      : 'bg-muted border-transparent'
-                  }`}>
-                    <input
-                      type="checkbox"
-                      checked={selectedModerators.has(moderator.id)}
-                      onChange={(e) => {
+              <div className="p-6">
+                {moderators.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">No active moderators found</p>
+                ) : (
+                  <div className="space-y-3">
+                    {moderators.map((moderator) => (
+                      <div key={moderator.id} className={`flex items-center space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                        selectedModerators.has(moderator.id) 
+                          ? 'bg-blue-50 border-blue-200' 
+                          : 'bg-gray-50 border-transparent hover:border-gray-200'
+                      }`} onClick={() => {
                         const newSelected = new Set(selectedModerators);
-                        if (e.target.checked) {
-                          newSelected.add(moderator.id);
-                        } else {
+                        if (selectedModerators.has(moderator.id)) {
                           newSelected.delete(moderator.id);
+                        } else {
+                          newSelected.add(moderator.id);
                         }
                         setSelectedModerators(newSelected);
-                      }}
-                      className="w-4 h-4 text-blue-600"
-                    />
-                    <Icon name="User" size={16} className={selectedModerators.has(moderator.id) ? 'text-blue-600' : ''} />
-                    <div className="flex-1">
-                      <span className={`font-medium ${
-                        selectedModerators.has(moderator.id) ? 'text-blue-900' : 'text-foreground'
-                      }`}>{moderator.name}</span>
-                      <span className="text-sm text-muted-foreground ml-2">({moderator.email})</span>
-                    </div>
-                    {selectedModerators.has(moderator.id) && (
-                      <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                        Selected
-                      </span>
-                    )}
+                      }}>
+                        <input
+                          type="checkbox"
+                          checked={selectedModerators.has(moderator.id)}
+                          onChange={() => {}}
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                          selectedModerators.has(moderator.id) 
+                            ? 'bg-gradient-to-r from-blue-500 to-indigo-500' 
+                            : 'bg-gray-100'
+                        }`}>
+                          <Icon name="User" className={`h-5 w-5 ${
+                            selectedModerators.has(moderator.id) ? 'text-white' : 'text-gray-600'
+                          }`} />
+                        </div>
+                        <div className="flex-1">
+                          <div className={`font-medium ${
+                            selectedModerators.has(moderator.id) ? 'text-blue-900' : 'text-gray-900'
+                          }`}>{moderator.name}</div>
+                          <div className="text-sm text-gray-500">{moderator.email}</div>
+                        </div>
+                        {selectedModerators.has(moderator.id) && (
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
+                            Selected
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>{selectedModerators.size}</strong> moderators selected • 
-                <strong>{(selectedModerators.size * numbersPerModerator).toLocaleString()}</strong> numbers will be assigned
-              </p>
             </div>
           </div>
 
-          <Button
-            onClick={assignNumbers}
-            disabled={unassignedCount === 0 || selectedModerators.size === 0 || assigning}
-            className="w-full"
-            loading={assigning}
-          >
-            {assigning ? 'Assigning Numbers...' : 
-              selectedModerators.size === 0 
-                ? 'Select Moderators First' 
-                : `Assign ${(selectedModerators.size * numbersPerModerator).toLocaleString()} Numbers to ${selectedModerators.size} Moderators`
-            }
-          </Button>
+          {/* Action Panel */}
+          <div className="space-y-6">
 
-          {result && (
-            <div className="bg-muted rounded-lg p-4">
-              <h3 className="font-medium text-foreground mb-3">Assignment Results</h3>
-              {result.message ? (
-                <p className="text-muted-foreground">{result.message}</p>
-              ) : (
-                <div className="space-y-2 text-sm">
-                  <p><span className="text-muted-foreground">Successfully Assigned:</span> <span className="font-medium text-green-600">{result.assigned.toLocaleString()}</span></p>
-                  <p><span className="text-muted-foreground">Moderators:</span> <span className="font-medium">{result.moderators}</span></p>
-                  <p><span className="text-muted-foreground">Per Moderator:</span> <span className="font-medium">{result.perModerator.toLocaleString()} numbers</span></p>
-                  <p className="text-green-600 font-medium">✅ Assignment Complete!</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Assignment Summary</h3>
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Selected Moderators:</span>
+                  <span className="font-medium text-gray-900">{selectedModerators.size}</span>
                 </div>
-              )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Numbers per Moderator:</span>
+                  <span className="font-medium text-gray-900">{numbersPerModerator.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Total to Assign:</span>
+                  <span className="font-medium text-blue-600">{(selectedModerators.size * numbersPerModerator).toLocaleString()}</span>
+                </div>
+              </div>
+              <button
+                onClick={assignNumbers}
+                disabled={unassignedCount === 0 || selectedModerators.size === 0 || assigning}
+                className={`w-full px-4 py-3 rounded-lg font-medium transition-colors ${
+                  unassignedCount === 0 || selectedModerators.size === 0 || assigning
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                {assigning ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <Icon name="Loader2" className="h-4 w-4 animate-spin" />
+                    <span>Assigning...</span>
+                  </div>
+                ) : selectedModerators.size === 0 ? (
+                  'Select Moderators First'
+                ) : (
+                  `Assign ${(selectedModerators.size * numbersPerModerator).toLocaleString()} Numbers`
+                )}
+              </button>
             </div>
-          )}
+
+            {result && (
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="p-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full">
+                    <Icon name="CheckCircle" className="h-4 w-4 text-white" />
+                  </div>
+                  <h3 className="font-medium text-green-900">Assignment Complete</h3>
+                </div>
+                {result.message ? (
+                  <p className="text-green-700">{result.message}</p>
+                ) : (
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-green-700">Successfully Assigned:</span>
+                      <span className="font-medium text-green-900">{result.assigned.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-green-700">Moderators:</span>
+                      <span className="font-medium text-green-900">{result.moderators}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-green-700">Per Moderator:</span>
+                      <span className="font-medium text-green-900">{result.perModerator.toLocaleString()}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

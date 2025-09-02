@@ -433,12 +433,17 @@ const ModeratorDashboard = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-            Dashboard
-          </h1>
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+              <Icon name="BarChart3" size={24} className="text-white" />
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              Dashboard
+            </h1>
+          </div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm md:text-base text-muted-foreground">
               Today's WhatsApp messaging tasks
@@ -451,20 +456,20 @@ const ModeratorDashboard = () => {
           </div>
           
           {/* Progress Bar */}
-          <div className="mt-4 p-3 md:p-4 bg-card border border-border rounded-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-              <span className="text-sm font-medium text-foreground">Daily Progress</span>
-              <span className="text-sm text-muted-foreground">
+          <div className="mt-4 p-4 md:p-6 bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
+              <span className="text-sm font-semibold text-gray-800">Daily Progress</span>
+              <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 {progress.completed} / {progress.total} ({progress.percentage}%)
               </span>
             </div>
-            <div className="w-full bg-muted rounded-full h-2">
+            <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
               <div
-                className="bg-primary h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500 shadow-sm"
                 style={{ width: `${progress.percentage}%` }}
               ></div>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-gray-600 mt-3 font-medium">
               Total: {dailyStats.totalAssigned} assigned • {dailyStats.pending} pending • {dailyStats.done} completed
             </p>
           </div>
@@ -472,46 +477,61 @@ const ModeratorDashboard = () => {
 
         {/* Lifetime Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 mb-6">
-          <div className="bg-card border border-border rounded-lg p-3 md:p-4">
+          <div className="bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl p-3 md:p-4 shadow-lg hover:shadow-xl transition-all duration-200">
             <div className="text-center">
-              <p className="text-xl md:text-2xl font-bold text-purple-600">{dailyStats.totalAssigned}</p>
-              <p className="text-xs md:text-sm text-muted-foreground">Total Assigned</p>
+              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                <Icon name="Users" size={16} className="text-white" />
+              </div>
+              <p className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">{dailyStats.totalAssigned}</p>
+              <p className="text-xs md:text-sm text-gray-600 font-medium">Total Assigned</p>
             </div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-3 md:p-4">
+          <div className="bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl p-3 md:p-4 shadow-lg hover:shadow-xl transition-all duration-200">
             <div className="text-center">
-              <p className="text-xl md:text-2xl font-bold text-orange-600">{dailyStats.pending}</p>
-              <p className="text-xs md:text-sm text-muted-foreground">Pending</p>
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                <Icon name="Clock" size={16} className="text-white" />
+              </div>
+              <p className="text-xl md:text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">{dailyStats.pending}</p>
+              <p className="text-xs md:text-sm text-gray-600 font-medium">Pending</p>
             </div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-3 md:p-4">
+          <div className="bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl p-3 md:p-4 shadow-lg hover:shadow-xl transition-all duration-200">
             <div className="text-center">
-              <p className="text-xl md:text-2xl font-bold text-blue-600">{dailyStats.done}</p>
-              <p className="text-xs md:text-sm text-muted-foreground">Done</p>
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                <Icon name="CheckCircle" size={16} className="text-white" />
+              </div>
+              <p className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">{dailyStats.done}</p>
+              <p className="text-xs md:text-sm text-gray-600 font-medium">Done</p>
             </div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-3 md:p-4">
+          <div className="bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl p-3 md:p-4 shadow-lg hover:shadow-xl transition-all duration-200">
             <div className="text-center">
-              <p className="text-xl md:text-2xl font-bold text-green-600">{dailyStats.hasWhatsApp}</p>
-              <p className="text-xs md:text-sm text-muted-foreground">Has WhatsApp</p>
+              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                <Icon name="MessageCircle" size={16} className="text-white" />
+              </div>
+              <p className="text-xl md:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{dailyStats.hasWhatsApp}</p>
+              <p className="text-xs md:text-sm text-gray-600 font-medium">Has WhatsApp</p>
             </div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-3 md:p-4">
+          <div className="bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl p-3 md:p-4 shadow-lg hover:shadow-xl transition-all duration-200">
             <div className="text-center">
-              <p className="text-xl md:text-2xl font-bold text-red-600">{dailyStats.noWhatsApp}</p>
-              <p className="text-xs md:text-sm text-muted-foreground">No WhatsApp</p>
+              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                <Icon name="XCircle" size={16} className="text-white" />
+              </div>
+              <p className="text-xl md:text-2xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">{dailyStats.noWhatsApp}</p>
+              <p className="text-xs md:text-sm text-gray-600 font-medium">No WhatsApp</p>
             </div>
           </div>
         </div>
 
         {/* Mobile-friendly tabs */}
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-1 mb-6 bg-muted p-1 rounded-lg">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-1 mb-6 bg-white/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-white/20">
           <button
             onClick={() => setActiveTab('pending')}
-            className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors flex-1 sm:flex-none ${
+            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex-1 sm:flex-none ${
               activeTab === 'pending'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
             }`}
           >
             <span className="block sm:hidden">Work ({numbers.length}/20)</span>
@@ -519,10 +539,10 @@ const ModeratorDashboard = () => {
           </button>
           <button
             onClick={() => setActiveTab('todaydone')}
-            className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors flex-1 sm:flex-none ${
+            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex-1 sm:flex-none ${
               activeTab === 'todaydone'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
             }`}
           >
             <span className="block sm:hidden">Today ({dailyStats.todayDone})</span>
@@ -530,10 +550,10 @@ const ModeratorDashboard = () => {
           </button>
           <button
             onClick={() => setActiveTab('done')}
-            className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors flex-1 sm:flex-none ${
+            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex-1 sm:flex-none ${
               activeTab === 'done'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
             }`}
           >
             <span className="block sm:hidden">All Done ({dailyStats.done})</span>
@@ -541,10 +561,10 @@ const ModeratorDashboard = () => {
           </button>
           <button
             onClick={() => setActiveTab('nowhatsapp')}
-            className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors flex-1 sm:flex-none ${
+            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex-1 sm:flex-none ${
               activeTab === 'nowhatsapp'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
             }`}
           >
             No WhatsApp ({dailyStats.noWhatsApp})
@@ -563,34 +583,34 @@ const ModeratorDashboard = () => {
               numbers.map((item) => (
                 <div
                   key={item.id}
-                  className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 border rounded-lg transition-all space-y-3 sm:space-y-0 ${
+                  className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 border rounded-xl transition-all space-y-3 sm:space-y-0 shadow-lg hover:shadow-xl ${
                     clickedNumbers.has(item.id) 
-                      ? 'bg-blue-50 border-blue-200 shadow-sm' 
-                      : 'bg-card border-border'
+                      ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200/50 shadow-md' 
+                      : 'bg-white/70 backdrop-blur-sm border-white/20'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full ${
+                    <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full shadow-md ${
                       clickedNumbers.has(item.id)
-                        ? 'bg-blue-100'
-                        : 'bg-primary/10'
+                        ? 'bg-gradient-to-br from-blue-500 to-indigo-600'
+                        : 'bg-gradient-to-br from-gray-400 to-gray-600'
                     }`}>
                       <Icon 
                         name={clickedNumbers.has(item.id) ? "MessageCircle" : "Phone"} 
                         size={16} 
-                        className={clickedNumbers.has(item.id) ? "text-blue-600" : "text-primary"} 
+                        className="text-white" 
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
-                        <p className="font-medium text-foreground text-sm sm:text-base truncate">{item.phone_number}</p>
+                        <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{item.phone_number}</p>
                         {clickedNumbers.has(item.id) && (
-                          <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 w-fit mt-1 sm:mt-0">
+                          <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white w-fit mt-1 sm:mt-0 shadow-sm">
                             WhatsApp Opened
                           </span>
                         )}
                       </div>
-                      <p className="text-xs sm:text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium">
                         Added: {new Date(item.created_at).toLocaleDateString()}
                       </p>
                     </div>

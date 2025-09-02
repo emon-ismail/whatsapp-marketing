@@ -214,210 +214,167 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
         <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                Admin Dashboard
-              </h1>
-              <p className="text-muted-foreground">
-                Monitor moderator performance and system statistics
-              </p>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div className="mb-4 lg:mb-0">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="p-2 bg-gradient-to-r from-violet-500 to-purple-600 rounded-lg">
+                  <Icon name="Shield" className="h-6 w-6 text-white" />
+                </div>
+                <h1 className="text-2xl font-semibold text-gray-900">Admin Dashboard</h1>
+              </div>
+              <p className="text-sm text-gray-600">Monitor performance and system analytics</p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0">
+            <div className="flex flex-col sm:flex-row gap-3">
               <select
                 value={selectedCampaign}
                 onChange={(e) => setSelectedCampaign(e.target.value)}
-                className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Campaigns</option>
                 <option value="oasis_outfit">Oasis Outfit</option>
-                <option value="zizii_island">Zizii Island (Birthday)</option>
+                <option value="zizii_island">Zizii Island</option>
               </select>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
-          
-          {/* Tabs */}
-          <div className="flex space-x-1 mb-6 bg-muted p-1 rounded-lg">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === 'overview'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('daily')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === 'daily'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Daily Reports ({new Date(selectedDate).toLocaleDateString()})
-            </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'overview'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('daily')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'daily'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Daily Report
+              </button>
+            </nav>
           </div>
-          
-          {/* Campaign Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="text-center">
-                <p className="text-lg font-bold text-blue-600">{campaignStats.oasis_outfit || 0}</p>
-                <p className="text-xs text-muted-foreground">Oasis Outfit</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg">
+                <Icon name="Users" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Numbers</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.total.toLocaleString()}</p>
               </div>
             </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="text-center">
-                <p className="text-lg font-bold text-purple-600">{campaignStats.zizii_island || 0}</p>
-                <p className="text-xs text-muted-foreground">Zizii Island</p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg">
+                <Icon name="CheckCircle" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Completed</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.done.toLocaleString()}</p>
               </div>
             </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="text-center">
-                <p className="text-lg font-bold text-green-600">{(campaignStats.oasis_outfit || 0) + (campaignStats.zizii_island || 0)}</p>
-                <p className="text-xs text-muted-foreground">Total Numbers</p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg">
+                <Icon name="Clock" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Pending</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.pending.toLocaleString()}</p>
               </div>
             </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="text-center">
-                <p className="text-lg font-bold text-orange-600">2</p>
-                <p className="text-xs text-muted-foreground">Active Campaigns</p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg">
+                <Icon name="Target" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Assigned</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.assigned.toLocaleString()}</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Overall Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center space-x-3">
-              <Icon name="Phone" size={24} className="text-blue-600" />
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.total.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Total Numbers</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center space-x-3">
-              <Icon name="Users" size={24} className="text-purple-600" />
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.assigned.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Assigned</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center space-x-3">
-              <Icon name="CheckCircle" size={24} className="text-green-600" />
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.done.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Completed</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center space-x-3">
-              <Icon name="Clock" size={24} className="text-orange-600" />
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.pending.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Pending</p>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {activeTab === 'overview' ? (
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-border">
-              <h2 className="text-xl font-semibold text-foreground">Overall Moderator Performance</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Team Performance</h3>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Moderator
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Assigned
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Completed
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Pending
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Has WhatsApp
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      No WhatsApp
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Progress
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Status
-                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">Moderator</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pending</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Has WhatsApp</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No WhatsApp</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Progress</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
-                <tbody className="bg-background divide-y divide-border">
+                <tbody className="bg-white divide-y divide-gray-200">
                   {moderators.map((moderator) => (
-                    <tr key={moderator.id} className="hover:bg-muted/50">
+                    <tr key={moderator.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-full mr-3">
-                            <Icon name="User" size={16} className="text-primary" />
+                          <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                            <Icon name="User" className="h-5 w-5 text-gray-600" />
                           </div>
-                          <div>
-                            <div className="text-sm font-medium text-foreground">{moderator.name}</div>
-                            <div className="text-sm text-muted-foreground">{moderator.email}</div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{moderator.name}</div>
+                            <div className="text-sm text-gray-500">{moderator.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                        {moderator.totalAssigned.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                        {moderator.completed.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600 font-medium">
-                        {moderator.pending.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">
-                        {moderator.hasWhatsApp.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
-                        {moderator.noWhatsApp.toLocaleString()}
-                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{moderator.totalAssigned.toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">{moderator.completed.toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-orange-600">{moderator.pending.toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">{moderator.hasWhatsApp.toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">{moderator.noWhatsApp.toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="w-16 bg-muted rounded-full h-2 mr-2">
-                            <div
-                              className="bg-primary h-2 rounded-full"
-                              style={{ width: `${moderator.completionRate}%` }}
-                            ></div>
+                          <div className="w-16 bg-gray-200 rounded-full h-2 mr-3">
+                            <div className="bg-gradient-to-r from-violet-500 to-purple-500 h-2 rounded-full" style={{ width: `${moderator.completionRate}%` }}></div>
                           </div>
-                          <span className="text-sm text-foreground">{moderator.completionRate}%</span>
+                          <span className="text-sm text-gray-900">{moderator.completionRate}%</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          moderator.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
+                          moderator.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {moderator.status}
                         </span>
@@ -429,109 +386,75 @@ const AdminDashboard = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-border">
-              <h2 className="text-xl font-semibold text-foreground">
-                Daily Performance Report - {new Date(selectedDate).toLocaleDateString()}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Track individual moderator performance for the selected date
-              </p>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Daily Report - {new Date(selectedDate).toLocaleDateString()}</h3>
+              <p className="text-sm text-gray-500 mt-1">Individual performance metrics</p>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Moderator
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Assigned Today
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Completed Today
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      WhatsApp Success
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      No WhatsApp
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Success Rate
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Current Pending
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Performance
-                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">Moderator</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Today</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed Today</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WhatsApp Success</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No WhatsApp</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Success Rate</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Pending</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
                   </tr>
                 </thead>
-                <tbody className="bg-background divide-y divide-border">
+                <tbody className="bg-white divide-y divide-gray-200">
                   {dailyReports.map((moderator) => {
-                    const isLowPerformance = moderator.todayCompleted < 10;
-                    const isHighPerformance = moderator.todayCompleted >= 20;
-                    
+                    const isLow = moderator.todayCompleted < 10;
+                    const isHigh = moderator.todayCompleted >= 20;
                     return (
-                      <tr key={moderator.id} className={`hover:bg-muted/50 ${
-                        isLowPerformance ? 'bg-red-50' : isHighPerformance ? 'bg-green-50' : ''
+                      <tr key={moderator.id} className={`hover:bg-gray-50 ${
+                        isLow ? 'bg-red-50' : isHigh ? 'bg-green-50' : ''
                       }`}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className={`flex items-center justify-center w-8 h-8 rounded-full mr-3 ${
-                              isLowPerformance ? 'bg-red-100' : isHighPerformance ? 'bg-green-100' : 'bg-primary/10'
+                            <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                              isLow ? 'bg-red-100' : isHigh ? 'bg-green-100' : 'bg-gray-100'
                             }`}>
-                              <Icon name="User" size={16} className={`${
-                                isLowPerformance ? 'text-red-600' : isHighPerformance ? 'text-green-600' : 'text-primary'
+                              <Icon name="User" className={`h-5 w-5 ${
+                                isLow ? 'text-red-600' : isHigh ? 'text-green-600' : 'text-gray-600'
                               }`} />
                             </div>
-                            <div>
-                              <div className="text-sm font-medium text-foreground">{moderator.name}</div>
-                              <div className="text-sm text-muted-foreground">{moderator.email}</div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">{moderator.name}</div>
+                              <div className="text-sm text-gray-500">{moderator.email}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {moderator.todayAssigned}
-                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{moderator.todayAssigned}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <span className={`${
-                            isLowPerformance ? 'text-red-600' : isHighPerformance ? 'text-green-600' : 'text-blue-600'
+                            isLow ? 'text-red-600' : isHigh ? 'text-green-600' : 'text-blue-600'
                           }`}>
                             {moderator.todayCompleted}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">
-                          {moderator.todayWhatsApp}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
-                          {moderator.todayNoWhatsApp}
-                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">{moderator.todayWhatsApp}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">{moderator.todayNoWhatsApp}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="w-12 bg-muted rounded-full h-2 mr-2">
-                              <div
-                                className={`h-2 rounded-full ${
-                                  moderator.todaySuccessRate >= 70 ? 'bg-green-500' : 
-                                  moderator.todaySuccessRate >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-                                }`}
-                                style={{ width: `${moderator.todaySuccessRate}%` }}
-                              ></div>
+                            <div className="w-12 bg-gray-200 rounded-full h-2 mr-2">
+                              <div className={`h-2 rounded-full ${
+                                moderator.todaySuccessRate >= 70 ? 'bg-green-500' : 
+                                moderator.todaySuccessRate >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                              }`} style={{ width: `${moderator.todaySuccessRate}%` }}></div>
                             </div>
-                            <span className="text-sm text-foreground">{moderator.todaySuccessRate}%</span>
+                            <span className="text-sm text-gray-900">{moderator.todaySuccessRate}%</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600">
-                          {moderator.currentPending}
-                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600">{moderator.currentPending}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            isLowPerformance ? 'bg-red-100 text-red-800' :
-                            isHighPerformance ? 'bg-green-100 text-green-800' :
-                            'bg-yellow-100 text-yellow-800'
+                            isLow ? 'bg-red-100 text-red-800' : isHigh ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                           }`}>
-                            {isLowPerformance ? 'Low' : isHighPerformance ? 'Excellent' : 'Good'}
+                            {isLow ? 'Low' : isHigh ? 'Excellent' : 'Good'}
                           </span>
                         </td>
                       </tr>
