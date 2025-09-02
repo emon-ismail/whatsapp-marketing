@@ -20,6 +20,9 @@ const ModeratorDashboard = () => {
   const [noWhatsAppNumbers, setNoWhatsAppNumbers] = useState([]);
   const [allNumbers, setAllNumbers] = useState(0);
   const [clickedNumbers, setClickedNumbers] = useState(new Set());
+  const [searchTerm, setSearchTerm] = useState('');
+  const [orderStats, setOrderStats] = useState({ totalOrders: 0, todayOrders: 0 });
+  const [orderedNumbers, setOrderedNumbers] = useState([]);
 
   const dailyLimit = 20;
   const today = new Date().toISOString().split('T')[0];
@@ -28,6 +31,7 @@ const ModeratorDashboard = () => {
     fetchNumbers();
     fetchDoneNumbers();
     fetchTodayDoneNumbers();
+    fetchOrderedNumbers();
   }, [user]);
 
   const fetchNumbers = async () => {
@@ -217,6 +221,26 @@ const ModeratorDashboard = () => {
 
       console.log('Stats results:', { pending, done, hasWhatsApp, noWhatsApp, totalAssigned, todayDone });
 
+      // Get order stats
+      const { count: totalOrders, error: ordersError } = await supabase
+        .from('phone_numbers')
+        .select('*', { count: 'exact', head: true })
+        .eq('assigned_moderator', moderatorId)
+        .eq('has_ordered', true);
+
+      const { count: todayOrders, error: todayOrdersError } = await supabase
+        .from('phone_numbers')
+        .select('*', { count: 'exact', head: true })
+        .eq('assigned_moderator', moderatorId)
+        .eq('has_ordered', true)
+        .gte('order_date', `${today}T00:00:00`)
+        .lte('order_date', `${today}T23:59:59`);
+
+      setOrderStats({
+        totalOrders: totalOrders || 0,
+        todayOrders: todayOrders || 0
+      });
+
       setDailyStats({
         pending: pending || 0,
         done: done || 0,
@@ -404,6 +428,75 @@ const ModeratorDashboard = () => {
     window.location.href = telUrl;
   };
 
+  const handleOrderUpdate = async (numberId, hasOrdered) => {
+    try {
+      const { error } = await supabase
+        .from('phone_numbers')
+        .update({
+          has_ordered: hasOrdered,
+          order_date: hasOrdered ? new Date().toISOString() : null
+        })
+        .eq('id', numberId);
+
+      if (error) throw error;
+      
+      fetchDoneNumbers();
+      fetchTodayDoneNumbers();
+      fetchOrderedNumbers();
+      
+      // Refresh stats
+      if (user) {
+        const { data: moderatorData } = await supabase
+          .from('moderators')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (moderatorData) {
+          await fetchDailyStats(moderatorData.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error);
+    }
+  };
+
+  const fetchOrderedNumbers = async () => {
+    try {
+      if (!user) {
+        setOrderedNumbers([]);
+        return;
+      }
+
+      const { data: moderatorData } = await supabase
+        .from('moderators')
+        .select('id, role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!moderatorData) {
+        setOrderedNumbers([]);
+        return;
+      }
+
+      if (moderatorData.role === 'moderator') {
+        const { data, error } = await supabase
+          .from('phone_numbers')
+          .select('*')
+          .eq('assigned_moderator', moderatorData.id)
+          .eq('has_ordered', true)
+          .order('order_date', { ascending: false });
+
+        if (error) throw error;
+        setOrderedNumbers(data || []);
+      } else {
+        setOrderedNumbers([]);
+      }
+    } catch (error) {
+      console.error('Error fetching ordered numbers:', error);
+    }
+  };
+
   const handleCheckWhatsApp = (item) => {
     // Open WhatsApp directly
     handleWhatsAppClick(item.phone_number);
@@ -524,6 +617,28 @@ const ModeratorDashboard = () => {
           </div>
         </div>
 
+        {/* Order Stats */}
+        <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6">
+          <div className="bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl p-3 md:p-4 shadow-lg hover:shadow-xl transition-all duration-200">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                <Icon name="ShoppingCart" size={16} className="text-white" />
+              </div>
+              <p className="text-xl md:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">{orderStats.totalOrders}</p>
+              <p className="text-xs md:text-sm text-gray-600 font-medium">Total Orders</p>
+            </div>
+          </div>
+          <div className="bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl p-3 md:p-4 shadow-lg hover:shadow-xl transition-all duration-200">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                <Icon name="TrendingUp" size={16} className="text-white" />
+              </div>
+              <p className="text-xl md:text-2xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">{orderStats.todayOrders}</p>
+              <p className="text-xs md:text-sm text-gray-600 font-medium">Today's Orders</p>
+            </div>
+          </div>
+        </div>
+
         {/* Mobile-friendly tabs */}
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-1 mb-6 bg-white/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-white/20">
           <button
@@ -558,6 +673,17 @@ const ModeratorDashboard = () => {
           >
             <span className="block sm:hidden">All Done ({dailyStats.done})</span>
             <span className="hidden sm:block">All Completed ({dailyStats.done})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('orders')}
+            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex-1 sm:flex-none ${
+              activeTab === 'orders'
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
+            }`}
+          >
+            <span className="block sm:hidden">Orders ({orderStats.totalOrders})</span>
+            <span className="hidden sm:block">Orders ({orderStats.totalOrders})</span>
           </button>
           <button
             onClick={() => setActiveTab('nowhatsapp')}
@@ -717,33 +843,136 @@ const ModeratorDashboard = () => {
           </div>
         ) : activeTab === 'done' ? (
           <div className="space-y-4">
-            {doneNumbers.length === 0 ? (
+            {/* Search Bar */}
+            <div className="bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl p-4 shadow-lg">
+              <div className="relative">
+                <Icon name="Search" size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search phone numbers..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
+                />
+              </div>
+            </div>
+            
+            {doneNumbers.filter(item => 
+              item.phone_number.toLowerCase().includes(searchTerm.toLowerCase())
+            ).length === 0 ? (
               <div className="text-center py-12">
                 <Icon name="CheckCircle" size={48} className="mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-medium text-foreground mb-2">No completed numbers</h3>
                 <p className="text-muted-foreground">Numbers you mark as done will appear here</p>
               </div>
             ) : (
-              doneNumbers.map((item) => (
+              doneNumbers.filter(item => 
+                item.phone_number.toLowerCase().includes(searchTerm.toLowerCase())
+              ).map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-4 bg-card border border-border rounded-lg opacity-75"
+                  className="flex items-center justify-between p-4 bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   <div className="flex items-center space-x-4">
-                    <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-                      <Icon name="CheckCircle" size={20} className="text-green-600" />
+                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full shadow-md">
+                      <Icon name="CheckCircle" size={20} className="text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">{item.phone_number}</p>
+                      <p className="font-semibold text-gray-800">{item.phone_number}</p>
                       <div className="flex items-center space-x-2">
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-600 font-medium">
                           Completed: {new Date(item.updated_at).toLocaleDateString()}
                         </p>
                         {item.has_whatsapp !== null && (
-                          <span className={`text-xs px-2 py-1 rounded-full ${
+                          <span className={`text-xs px-2 py-1 rounded-full shadow-sm ${
                             item.has_whatsapp 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
+                              : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
+                          }`}>
+                            {item.has_whatsapp ? 'Has WhatsApp' : 'No WhatsApp'}
+                          </span>
+                        )}
+                        {item.has_ordered && (
+                          <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm">
+                            Ordered on {new Date(item.order_date).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleWhatsAppClick(item.phone_number)}
+                      className="flex items-center space-x-2"
+                    >
+                      <Icon name="MessageCircle" size={16} />
+                      <span>WhatsApp</span>
+                    </Button>
+                    {item.has_ordered ? (
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm">
+                          Ordered
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleOrderUpdate(item.id, false)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Icon name="X" size={14} />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleOrderUpdate(item.id, true)}
+                        className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white flex items-center space-x-1"
+                      >
+                        <Icon name="ShoppingCart" size={14} />
+                        <span>Mark Order</span>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        ) : activeTab === 'orders' ? (
+          <div className="space-y-4">
+            {orderedNumbers.length === 0 ? (
+              <div className="text-center py-12">
+                <Icon name="ShoppingCart" size={48} className="mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-medium text-foreground mb-2">No orders yet</h3>
+                <p className="text-muted-foreground">Numbers that result in orders will appear here</p>
+              </div>
+            ) : (
+              orderedNumbers.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full shadow-md">
+                      <Icon name="ShoppingCart" size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800">{item.phone_number}</p>
+                      <div className="flex items-center space-x-2">
+                        <p className="text-sm text-gray-600 font-medium">
+                          Ordered: {new Date(item.order_date).toLocaleDateString()}
+                        </p>
+                        <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm">
+                          Order Confirmed
+                        </span>
+                        {item.has_whatsapp !== null && (
+                          <span className={`text-xs px-2 py-1 rounded-full shadow-sm ${
+                            item.has_whatsapp 
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
+                              : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
                           }`}>
                             {item.has_whatsapp ? 'Has WhatsApp' : 'No WhatsApp'}
                           </span>
@@ -761,6 +990,15 @@ const ModeratorDashboard = () => {
                     >
                       <Icon name="MessageCircle" size={16} />
                       <span>WhatsApp</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOrderUpdate(item.id, false)}
+                      className="text-red-600 hover:text-red-700 flex items-center space-x-1"
+                    >
+                      <Icon name="X" size={14} />
+                      <span>Remove</span>
                     </Button>
                   </div>
                 </div>
