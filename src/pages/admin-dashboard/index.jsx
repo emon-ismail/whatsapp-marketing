@@ -5,7 +5,7 @@ import Icon from '../../components/AppIcon';
 const AdminDashboard = () => {
   const [moderators, setModerators] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ total: 0, assigned: 0, done: 0, pending: 0 });
+  const [stats, setStats] = useState({ total: 0, assigned: 0, done: 0, pending: 0, totalOrders: 0, todayOrders: 0 });
   const [selectedCampaign, setSelectedCampaign] = useState('all');
   const [campaignStats, setCampaignStats] = useState({});
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -83,6 +83,12 @@ const AdminDashboard = () => {
             .eq('assigned_moderator', moderator.id)
             .eq('has_whatsapp', false);
 
+          const { count: totalOrders } = await supabase
+            .from('phone_numbers')
+            .select('*', { count: 'exact', head: true })
+            .eq('assigned_moderator', moderator.id)
+            .eq('has_ordered', true);
+
           return {
             ...moderator,
             totalAssigned: totalAssigned || 0,
@@ -90,7 +96,9 @@ const AdminDashboard = () => {
             pending: pending || 0,
             hasWhatsApp: hasWhatsApp || 0,
             noWhatsApp: noWhatsApp || 0,
-            completionRate: totalAssigned > 0 ? Math.round((completed / totalAssigned) * 100) : 0
+            totalOrders: totalOrders || 0,
+            completionRate: totalAssigned > 0 ? Math.round((completed / totalAssigned) * 100) : 0,
+            orderRate: completed > 0 ? Math.round((totalOrders / completed) * 100) : 0
           };
         })
       );
@@ -124,11 +132,25 @@ const AdminDashboard = () => {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending');
 
+      const { count: totalOrders } = await supabase
+        .from('phone_numbers')
+        .select('*', { count: 'exact', head: true })
+        .eq('has_ordered', true);
+
+      const { count: todayOrders } = await supabase
+        .from('phone_numbers')
+        .select('*', { count: 'exact', head: true })
+        .eq('has_ordered', true)
+        .gte('order_date', `${new Date().toISOString().split('T')[0]}T00:00:00`)
+        .lte('order_date', `${new Date().toISOString().split('T')[0]}T23:59:59`);
+
       setStats({
         total: total || 0,
         assigned: assigned || 0,
         done: done || 0,
-        pending: pending || 0
+        pending: pending || 0,
+        totalOrders: totalOrders || 0,
+        todayOrders: todayOrders || 0
       });
     } catch (error) {
       console.error('Error fetching overall stats:', error);
@@ -184,6 +206,14 @@ const AdminDashboard = () => {
             .eq('assigned_moderator', moderator.id)
             .eq('status', 'pending');
 
+          const { count: todayOrders } = await supabase
+            .from('phone_numbers')
+            .select('*', { count: 'exact', head: true })
+            .eq('assigned_moderator', moderator.id)
+            .eq('has_ordered', true)
+            .gte('order_date', `${selectedDate}T00:00:00`)
+            .lte('order_date', `${selectedDate}T23:59:59`);
+
           return {
             ...moderator,
             todayCompleted: todayCompleted || 0,
@@ -191,7 +221,9 @@ const AdminDashboard = () => {
             todayWhatsApp: todayWhatsApp || 0,
             todayNoWhatsApp: todayNoWhatsApp || 0,
             currentPending: currentPending || 0,
-            todaySuccessRate: todayCompleted > 0 ? Math.round((todayWhatsApp / todayCompleted) * 100) : 0
+            todayOrders: todayOrders || 0,
+            todaySuccessRate: todayCompleted > 0 ? Math.round((todayWhatsApp / todayCompleted) * 100) : 0,
+            todayOrderRate: todayCompleted > 0 ? Math.round((todayOrders / todayCompleted) * 100) : 0
           };
         })
       );
@@ -277,7 +309,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="p-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg">
@@ -322,9 +354,29 @@ const AdminDashboard = () => {
               </div>
             </div>
           </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+                <Icon name="ShoppingCart" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Orders</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.totalOrders.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg">
+                <Icon name="TrendingUp" className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Today's Orders</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.todayOrders.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
         </div>
-
-
 
         {activeTab === 'overview' ? (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -341,7 +393,9 @@ const AdminDashboard = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pending</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Has WhatsApp</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No WhatsApp</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Progress</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Order Rate</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
@@ -364,12 +418,21 @@ const AdminDashboard = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-orange-600">{moderator.pending.toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">{moderator.hasWhatsApp.toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">{moderator.noWhatsApp.toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-600">{moderator.totalOrders.toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-16 bg-gray-200 rounded-full h-2 mr-3">
                             <div className="bg-gradient-to-r from-violet-500 to-purple-500 h-2 rounded-full" style={{ width: `${moderator.completionRate}%` }}></div>
                           </div>
                           <span className="text-sm text-gray-900">{moderator.completionRate}%</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-16 bg-gray-200 rounded-full h-2 mr-3">
+                            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full" style={{ width: `${moderator.orderRate}%` }}></div>
+                          </div>
+                          <span className="text-sm text-gray-900">{moderator.orderRate}%</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -400,7 +463,9 @@ const AdminDashboard = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed Today</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WhatsApp Success</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No WhatsApp</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders Today</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Success Rate</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">Order Rate</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Pending</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
                   </tr>
@@ -438,6 +503,7 @@ const AdminDashboard = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">{moderator.todayWhatsApp}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">{moderator.todayNoWhatsApp}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-600">{moderator.todayOrders}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="w-12 bg-gray-200 rounded-full h-2 mr-2">
@@ -447,6 +513,17 @@ const AdminDashboard = () => {
                               }`} style={{ width: `${moderator.todaySuccessRate}%` }}></div>
                             </div>
                             <span className="text-sm text-gray-900">{moderator.todaySuccessRate}%</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="w-12 bg-gray-200 rounded-full h-2 mr-2">
+                              <div className={`h-2 rounded-full ${
+                                moderator.todayOrderRate >= 20 ? 'bg-emerald-500' : 
+                                moderator.todayOrderRate >= 10 ? 'bg-yellow-500' : 'bg-red-500'
+                              }`} style={{ width: `${moderator.todayOrderRate}%` }}></div>
+                            </div>
+                            <span className="text-sm text-gray-900">{moderator.todayOrderRate}%</span>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600">{moderator.currentPending}</td>
