@@ -11,18 +11,23 @@ const ModeratorDashboard = () => {
   const navigate = useNavigate();
   const [numbers, setNumbers] = useState([]);
   const [doneNumbers, setDoneNumbers] = useState([]);
+  const [todayDoneNumbers, setTodayDoneNumbers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
   const [progress, setProgress] = useState({ completed: 0, total: 0, percentage: 0 });
   const [userRole, setUserRole] = useState('moderator');
-  const [dailyStats, setDailyStats] = useState({ pending: 0, done: 0, hasWhatsApp: 0, noWhatsApp: 0 });
+  const [dailyStats, setDailyStats] = useState({ pending: 0, done: 0, hasWhatsApp: 0, noWhatsApp: 0, totalAssigned: 0, todayDone: 0 });
   const [noWhatsAppNumbers, setNoWhatsAppNumbers] = useState([]);
   const [allNumbers, setAllNumbers] = useState(0);
   const [clickedNumbers, setClickedNumbers] = useState(new Set());
 
+  const dailyLimit = 20;
+  const today = new Date().toISOString().split('T')[0];
+
   useEffect(() => {
     fetchNumbers();
     fetchDoneNumbers();
+    fetchTodayDoneNumbers();
   }, [user]);
 
   const fetchNumbers = async () => {
@@ -34,11 +39,17 @@ const ModeratorDashboard = () => {
       }
 
       // Check if moderator record exists
-      let { data: moderatorData } = await supabase
+      let { data: moderatorData, error: moderatorError } = await supabase
         .from('moderators')
         .select('id, role')
         .eq('user_id', user.id)
         .single();
+
+      if (moderatorError && moderatorError.code !== 'PGRST116') {
+        console.error('Error fetching moderator:', moderatorError);
+      }
+      
+      console.log('Moderator data:', moderatorData);
 
       // If no moderator record, create one
       if (!moderatorData) {
@@ -71,27 +82,22 @@ const ModeratorDashboard = () => {
 
       // Only fetch numbers for regular moderators
       if (moderatorData.role === 'moderator') {
-        // Get today's date
-        const today = new Date().toISOString().split('T')[0];
-        
-        // Fetch only 20 pending numbers for today
+        // Fetch ALL pending numbers assigned to this moderator (not just today's)
         const { data, error } = await supabase
           .from('phone_numbers')
           .select('*')
           .eq('status', 'pending')
           .eq('assigned_moderator', moderatorData.id)
-          .gte('assigned_at', `${today}T00:00:00`)
-          .lte('assigned_at', `${today}T23:59:59`)
           .order('created_at', { ascending: true })
-          .limit(20);
+          .limit(20); // Show 20 at a time for better performance
 
         if (error) throw error;
         
         setNumbers(data || []);
         
         // Get daily stats
-        await fetchDailyStats(moderatorData.id, today);
-        await fetchNoWhatsAppNumbers(moderatorData.id, today);
+        await fetchDailyStats(moderatorData.id);
+        await fetchNoWhatsAppNumbers(moderatorData.id);
         await fetchAllNumbers(moderatorData.id);
       } else {
         // Admin/superadmin don't get assigned numbers
@@ -150,19 +156,56 @@ const ModeratorDashboard = () => {
     }
   };
 
-  const fetchDailyStats = async (moderatorId, today) => {
+  const fetchDailyStats = async (moderatorId) => {
     try {
-      // Get today's pending count
-      const { count: pending } = await supabase
+      console.log('Fetching stats for moderator ID:', moderatorId);
+      
+      // Get ALL pending numbers (lifetime)
+      const { count: pending, error: pendingError } = await supabase
         .from('phone_numbers')
         .select('*', { count: 'exact', head: true })
         .eq('assigned_moderator', moderatorId)
-        .eq('status', 'pending')
-        .gte('assigned_at', `${today}T00:00:00`)
-        .lte('assigned_at', `${today}T23:59:59`);
+        .eq('status', 'pending');
 
-      // Get today's done count (by completion date)
-      const { count: done } = await supabase
+      if (pendingError) console.error('Pending error:', pendingError);
+
+      // Get ALL done numbers (lifetime)
+      const { count: done, error: doneError } = await supabase
+        .from('phone_numbers')
+        .select('*', { count: 'exact', head: true })
+        .eq('assigned_moderator', moderatorId)
+        .eq('status', 'done');
+
+      if (doneError) console.error('Done error:', doneError);
+
+      // Get ALL has WhatsApp numbers (lifetime)
+      const { count: hasWhatsApp, error: whatsappError } = await supabase
+        .from('phone_numbers')
+        .select('*', { count: 'exact', head: true })
+        .eq('assigned_moderator', moderatorId)
+        .eq('has_whatsapp', true);
+
+      if (whatsappError) console.error('WhatsApp error:', whatsappError);
+
+      // Get ALL no WhatsApp numbers (lifetime)
+      const { count: noWhatsApp, error: noWhatsappError } = await supabase
+        .from('phone_numbers')
+        .select('*', { count: 'exact', head: true })
+        .eq('assigned_moderator', moderatorId)
+        .eq('has_whatsapp', false);
+
+      if (noWhatsappError) console.error('No WhatsApp error:', noWhatsappError);
+
+      // Get total assigned numbers
+      const { count: totalAssigned, error: totalError } = await supabase
+        .from('phone_numbers')
+        .select('*', { count: 'exact', head: true })
+        .eq('assigned_moderator', moderatorId);
+
+      if (totalError) console.error('Total error:', totalError);
+
+      // Get today's completed numbers
+      const { count: todayDone, error: todayError } = await supabase
         .from('phone_numbers')
         .select('*', { count: 'exact', head: true })
         .eq('assigned_moderator', moderatorId)
@@ -170,44 +213,30 @@ const ModeratorDashboard = () => {
         .gte('updated_at', `${today}T00:00:00`)
         .lte('updated_at', `${today}T23:59:59`);
 
-      // Get today's has WhatsApp count (by completion date)
-      const { count: hasWhatsApp } = await supabase
-        .from('phone_numbers')
-        .select('*', { count: 'exact', head: true })
-        .eq('assigned_moderator', moderatorId)
-        .eq('has_whatsapp', true)
-        .gte('updated_at', `${today}T00:00:00`)
-        .lte('updated_at', `${today}T23:59:59`);
+      if (todayError) console.error('Today done error:', todayError);
 
-      // Get today's no WhatsApp count (by completion date)
-      const { count: noWhatsApp } = await supabase
-        .from('phone_numbers')
-        .select('*', { count: 'exact', head: true })
-        .eq('assigned_moderator', moderatorId)
-        .eq('has_whatsapp', false)
-        .gte('updated_at', `${today}T00:00:00`)
-        .lte('updated_at', `${today}T23:59:59`);
+      console.log('Stats results:', { pending, done, hasWhatsApp, noWhatsApp, totalAssigned, todayDone });
 
       setDailyStats({
         pending: pending || 0,
         done: done || 0,
         hasWhatsApp: hasWhatsApp || 0,
-        noWhatsApp: noWhatsApp || 0
+        noWhatsApp: noWhatsApp || 0,
+        totalAssigned: totalAssigned || 0,
+        todayDone: todayDone || 0
       });
     } catch (error) {
       console.error('Error fetching daily stats:', error);
     }
   };
 
-  const fetchNoWhatsAppNumbers = async (moderatorId, today) => {
+  const fetchNoWhatsAppNumbers = async (moderatorId) => {
     try {
       const { data, error } = await supabase
         .from('phone_numbers')
         .select('*')
         .eq('assigned_moderator', moderatorId)
         .eq('has_whatsapp', false)
-        .gte('updated_at', `${today}T00:00:00`)
-        .lte('updated_at', `${today}T23:59:59`)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
@@ -289,6 +318,46 @@ const ModeratorDashboard = () => {
     }
   };
 
+  const fetchTodayDoneNumbers = async () => {
+    try {
+      if (!user) {
+        setTodayDoneNumbers([]);
+        return;
+      }
+
+      // Get moderator record for current user
+      const { data: moderatorData } = await supabase
+        .from('moderators')
+        .select('id, role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!moderatorData) {
+        setTodayDoneNumbers([]);
+        return;
+      }
+
+      // Only fetch today's done numbers for regular moderators
+      if (moderatorData.role === 'moderator') {
+        const { data, error } = await supabase
+          .from('phone_numbers')
+          .select('*')
+          .eq('status', 'done')
+          .eq('assigned_moderator', moderatorData.id)
+          .gte('updated_at', `${today}T00:00:00`)
+          .lte('updated_at', `${today}T23:59:59`)
+          .order('updated_at', { ascending: false });
+
+        if (error) throw error;
+        setTodayDoneNumbers(data || []);
+      } else {
+        setTodayDoneNumbers([]);
+      }
+    } catch (error) {
+      console.error('Error fetching today done numbers:', error);
+    }
+  };
+
   const handleWhatsAppClick = (phoneNumber, numberId) => {
     const cleanNumber = phoneNumber.replace(/[^\d]/g, '');
     const whatsappUrl = `https://wa.me/${cleanNumber}`;
@@ -323,6 +392,7 @@ const ModeratorDashboard = () => {
       
       fetchNumbers();
       fetchDoneNumbers();
+      fetchTodayDoneNumbers();
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -395,13 +465,19 @@ const ModeratorDashboard = () => {
               ></div>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Daily target: 20 numbers • Complete today's work to get tomorrow's batch
+              Total: {dailyStats.totalAssigned} assigned • {dailyStats.pending} pending • {dailyStats.done} completed
             </p>
           </div>
         </div>
 
-        {/* Daily Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
+        {/* Lifetime Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 mb-6">
+          <div className="bg-card border border-border rounded-lg p-3 md:p-4">
+            <div className="text-center">
+              <p className="text-xl md:text-2xl font-bold text-purple-600">{dailyStats.totalAssigned}</p>
+              <p className="text-xs md:text-sm text-muted-foreground">Total Assigned</p>
+            </div>
+          </div>
           <div className="bg-card border border-border rounded-lg p-3 md:p-4">
             <div className="text-center">
               <p className="text-xl md:text-2xl font-bold text-orange-600">{dailyStats.pending}</p>
@@ -442,6 +518,17 @@ const ModeratorDashboard = () => {
             <span className="hidden sm:block">Today's Work ({numbers.length}/20)</span>
           </button>
           <button
+            onClick={() => setActiveTab('todaydone')}
+            className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors flex-1 sm:flex-none ${
+              activeTab === 'todaydone'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <span className="block sm:hidden">Today ({dailyStats.todayDone})</span>
+            <span className="hidden sm:block">Completed Today ({dailyStats.todayDone})</span>
+          </button>
+          <button
             onClick={() => setActiveTab('done')}
             className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors flex-1 sm:flex-none ${
               activeTab === 'done'
@@ -449,8 +536,8 @@ const ModeratorDashboard = () => {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <span className="block sm:hidden">Done ({dailyStats.done})</span>
-            <span className="hidden sm:block">Completed Today ({dailyStats.done})</span>
+            <span className="block sm:hidden">All Done ({dailyStats.done})</span>
+            <span className="hidden sm:block">All Completed ({dailyStats.done})</span>
           </button>
           <button
             onClick={() => setActiveTab('nowhatsapp')}
@@ -550,6 +637,58 @@ const ModeratorDashboard = () => {
                     >
                       <Icon name="X" size={14} />
                       <span className="text-xs sm:text-sm">No WhatsApp</span>
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        ) : activeTab === 'todaydone' ? (
+          <div className="space-y-4">
+            {todayDoneNumbers.length === 0 ? (
+              <div className="text-center py-12">
+                <Icon name="CheckCircle" size={48} className="mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-medium text-foreground mb-2">No numbers completed today</h3>
+                <p className="text-muted-foreground">Numbers you complete today will appear here</p>
+              </div>
+            ) : (
+              todayDoneNumbers.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 bg-card border border-border rounded-lg opacity-75"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
+                      <Icon name="CheckCircle" size={20} className="text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">{item.phone_number}</p>
+                      <div className="flex items-center space-x-2">
+                        <p className="text-sm text-muted-foreground">
+                          Completed: {new Date(item.updated_at).toLocaleDateString()}
+                        </p>
+                        {item.has_whatsapp !== null && (
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            item.has_whatsapp 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {item.has_whatsapp ? 'Has WhatsApp' : 'No WhatsApp'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleWhatsAppClick(item.phone_number)}
+                      className="flex items-center space-x-2"
+                    >
+                      <Icon name="MessageCircle" size={16} />
+                      <span>WhatsApp</span>
                     </Button>
                   </div>
                 </div>
