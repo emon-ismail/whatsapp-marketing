@@ -40,7 +40,7 @@ const AdminDashboard = () => {
     if (activeTab === 'numbers') {
       fetchAllNumbers(1, searchTerm);
     }
-  }, [activeTab, selectedCampaign]);
+  }, [activeTab, selectedCampaign, statusFilter]);
 
   useEffect(() => {
     if (activeTab === 'numbers') {
@@ -278,6 +278,30 @@ const AdminDashboard = () => {
       if (search.trim()) {
         const searchValue = search.trim();
         query = query.ilike('phone_number', `%${searchValue}%`);
+      }
+
+      // Apply status filters at database level
+      if (statusFilter !== 'all') {
+        switch (statusFilter) {
+          case 'pending':
+            query = query.eq('status', 'pending');
+            break;
+          case 'done':
+            query = query.eq('status', 'done');
+            break;
+          case 'has_whatsapp':
+            query = query.eq('has_whatsapp', true);
+            break;
+          case 'no_whatsapp':
+            query = query.eq('has_whatsapp', false);
+            break;
+          case 'ordered':
+            query = query.eq('has_ordered', true);
+            break;
+          case 'unassigned':
+            query = query.is('assigned_moderator', null);
+            break;
+        }
       }
 
       query = query.range(from, to);
@@ -777,17 +801,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const filteredNumbers = allNumbers.filter(number => {
-    const matchesStatus = statusFilter === 'all' || 
-      (statusFilter === 'pending' && number.status === 'pending') ||
-      (statusFilter === 'done' && number.status === 'done') ||
-      (statusFilter === 'has_whatsapp' && number.has_whatsapp === true) ||
-      (statusFilter === 'no_whatsapp' && number.has_whatsapp === false) ||
-      (statusFilter === 'ordered' && number.has_ordered === true) ||
-      (statusFilter === 'unassigned' && !number.assigned_moderator);
-    
-    return matchesStatus;
-  });
+  const filteredNumbers = allNumbers;
 
   if (loading) {
     return (
