@@ -55,12 +55,18 @@ export const AuthProvider = ({ children }) => {
         throw error
       }
 
-      // Get user's company from moderators table
-      const { data: moderatorData } = await supabase
+      // Check if moderator exists and is active
+      const { data: moderatorData, error: moderatorError } = await supabase
         .from('moderators')
-        .select('company')
+        .select('company, email, status')
         .eq('user_id', data.user.id)
         .single()
+
+      if (moderatorError || !moderatorData || moderatorData.status !== 'active') {
+        // Moderator doesn't exist or is inactive, sign out the user
+        await supabase?.auth?.signOut()
+        throw new Error('User account has been deactivated. Please contact administrator.')
+      }
 
       return { 
         success: true, 

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes as RouterRoutes, Route, Navigate, useLocation } from "react-router-dom";
 import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
 import Navbar from "components/Navbar";
@@ -17,16 +17,18 @@ import AdminAssign from './pages/admin-assign';
 import AdminDashboard from './pages/admin-dashboard';
 import BirthdayDashboard from './pages/birthday-dashboard';
 import Login from './pages/login';
+import { useAuth } from './contexts/AuthContext';
 
-const Routes = () => {
+const AppContent = () => {
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+  const showNavbar = isAuthenticated && location.pathname !== '/login';
+
   return (
-    <BrowserRouter>
-      <ErrorBoundary>
-        <div className="min-h-screen bg-background">
-          <Navbar />
-          <ScrollToTop />
-          <RouterRoutes>
-        {/* Define your route here */}
+    <div className="min-h-screen bg-background">
+      {showNavbar && <Navbar />}
+      <ScrollToTop />
+      <RouterRoutes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/message-status-tracking" element={<MessageStatusTracking />} />
         <Route path="/moderator-assignment-dashboard" element={<ModeratorAssignmentDashboard />} />
@@ -61,8 +63,16 @@ const Routes = () => {
         } />
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<NotFound />} />
-          </RouterRoutes>
-        </div>
+      </RouterRoutes>
+    </div>
+  );
+};
+
+const Routes = () => {
+  return (
+    <BrowserRouter>
+      <ErrorBoundary>
+        <AppContent />
       </ErrorBoundary>
     </BrowserRouter>
   );

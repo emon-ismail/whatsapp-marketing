@@ -27,28 +27,36 @@ const Login = () => {
           setTimeout(async () => {
             const { data: moderatorData } = await supabase
               .from('moderators')
-              .select('company')
+              .select('company, role')
               .eq('user_id', result.user.id)
               .single();
             
+            const userRole = moderatorData?.role || 'moderator';
             const userCompany = moderatorData?.company || 'oasis_outfit';
-            if (userCompany === 'zizii_island') {
+            
+            if (userRole === 'admin') {
+              navigate('/admin-dashboard');
+            } else if (userCompany === 'zizii_island') {
               navigate('/birthday-dashboard');
             } else {
               navigate('/moderator-dashboard');
             }
           }, 500);
         } else {
-          // For login, redirect based on company
+          // For login, redirect based on role and company
           setTimeout(async () => {
             const { data: moderatorData } = await supabase
               .from('moderators')
-              .select('company')
+              .select('company, role')
               .eq('user_id', result.user.id)
               .single();
             
+            const userRole = moderatorData?.role || 'moderator';
             const userCompany = moderatorData?.company || 'oasis_outfit';
-            if (userCompany === 'zizii_island') {
+            
+            if (userRole === 'admin') {
+              navigate('/admin-dashboard');
+            } else if (userCompany === 'zizii_island') {
               navigate('/birthday-dashboard');
             } else {
               navigate('/moderator-dashboard');
